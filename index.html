@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Life Rivers // Exhibition Gallery</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tone.js for Web Audio Synthesis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            darkwall: {
+              950: '#0a0a0c',
+              900: '#121215',
+              850: '#18181c',
+              800: '#222227',
+              700: '#32323a',
+            },
+            lightwall: {
+              50: '#fdfdfc',
+              100: '#f6f5f0',
+              200: '#ebe8e0',
+              300: '#dad5c7',
+              800: '#2a2824',
+              900: '#1c1a17',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* Custom Smooth Scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    ::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(150,150,150,0.3);
+      border-radius: 3px;
+    }
+
+    /* DARK MODE GALLERY WALL TEXTURE */
+    .dark .museum-wall {
+      background-color: #161619;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
+        linear-gradient(to bottom, #0d0d0f 0%, #161619 40%, #1a1a1e 80%, #0d0d0f 100%);
+      background-size: 28px 28px, 100% 100%;
+    }
+
+    /* LIGHT MODE GALLERY WALL TEXTURE */
+    .light .museum-wall {
+      background-color: #f5f4ef;
+      background-image: 
+        radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0),
+        linear-gradient(to bottom, #eae7df 0%, #f5f4ef 30%, #f7f6f2 70%, #e3dfd3 100%);
+      background-size: 28px 28px, 100% 100%;
+    }
+
+    /* GALLERY SPOTLIGHTS */
+    .dark .spotlight-cone {
+      background: radial-gradient(
+        ellipse at top center,
+        rgba(255, 245, 215, 0.28) 0%,
+        rgba(255, 245, 215, 0.1) 40%,
+        rgba(22, 22, 25, 0) 75%
+      );
+    }
+    .light .spotlight-cone {
+      background: radial-gradient(
+        ellipse at top center,
+        rgba(255, 255, 255, 0.65) 0%,
+        rgba(255, 250, 235, 0.3) 45%,
+        rgba(245, 244, 239, 0) 80%
+      );
+    }
+
+    /* Realistic Museum Floor Drop Shadow & Reflection */
+    .gallery-floor {
+      box-shadow: inset 0 20px 30px -10px rgba(0, 0, 0, 0.4);
+    }
+    .dark .gallery-floor {
+      background: linear-gradient(to bottom, #111113 0%, #080809 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .light .gallery-floor {
+      background: linear-gradient(to bottom, #dfdbcf 0%, #c8c3b3 100%);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    /* FINE ART FRAME STYLING */
+    /* Fine White Frame */
+    .frame-white-gallery {
+      background: #fcfcfc;
+      border: 9px solid #f2f2f0;
+      box-shadow: 0 22px 45px -12px rgba(0, 0, 0, 0.75),
+                  0 0 0 1px rgba(0, 0, 0, 0.3),
+                  inset 0 0 10px rgba(0, 0, 0, 0.06);
+    }
+    /* Fine Black Frame */
+    .frame-black-gallery {
+      background: #0d0d0e;
+      border: 9px solid #1c1c20;
+      box-shadow: 0 22px 45px -12px rgba(0, 0, 0, 0.85),
+                  0 0 0 1px rgba(255, 255, 255, 0.12),
+                  inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    /* Fine Oak Frame */
+    .frame-oak-gallery {
+      background: #dfcbab;
+      border: 10px solid #a88a62;
+      box-shadow: 0 22px 45px -12px rgba(0, 0, 0, 0.75),
+                  0 0 0 1px rgba(0, 0, 0, 0.25);
+    }
+
+    /* PASSE-PARTOUT MATTING */
+    .mat-thick { padding: 1.75rem; }
+    .mat-medium { padding: 1.1rem; }
+    .mat-thin { padding: 0.5rem; }
+    .mat-none { padding: 0; }
+
+    /* MUSEUM PLAQUE STYLING */
+    .dark .museum-plaque {
+      background: #f8f8f8;
+      color: #111113;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    .light .museum-plaque {
+      background: #ffffff;
+      color: #181715;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    /* UI GLASS PANELS */
+    .dark .glass-panel {
+      background: rgba(18, 18, 22, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f1f1f5;
+    }
+    .light .glass-panel {
+      background: rgba(252, 251, 248, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: #1c1b18;
+    }
+
+    /* HORIZONTAL PAN SCROLL CURSOR */
+    .pan-grab { cursor: grab; }
+    .pan-grabbing { cursor: grabbing; user-select: none; }
+  </style>
+</head>
+
+<body class="h-full antialiased font-sans museum-wall min-h-screen flex flex-col overflow-hidden text-neutral-100 transition-colors duration-500">
+
+  <!-- TOP HEADER NAVIGATION BAR -->
+  <header class="fixed top-0 left-0 right-0 z-40 glass-panel px-6 py-3 transition-colors duration-500">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand & Exhibition Info -->
+      <div class="flex items-center space-x-6">
+        <a href="#" class="flex items-center space-x-3 group">
+          <div class="w-8 h-8 rounded-full border border-neutral-500/40 flex items-center justify-center group-hover:border-neutral-300 transition-colors">
+            <span class="font-serif italic font-semibold text-xs tracking-wider">R</span>
+          </div>
+          <div>
+            <h1 class="font-serif tracking-widest text-sm md:text-base font-medium uppercase">Our Life Rivers</h1>
+            <p class="text-[10px] tracking-wider text-amber-500/90 font-mono uppercase">(Of 25E1, by Mrs. Nguyen Thu Le Hang)</p>
+          </div>
+        </a>
+
+        <!-- Room Selector -->
+        <div class="hidden md:flex items-center space-x-2 border-l border-neutral-500/20 pl-6">
+          <span class="text-[11px] font-mono uppercase tracking-wider text-neutral-400">Hall:</span>
+          <select id="roomSelect" onchange="switchExhibitionRoom(this.value)" class="bg-black/10 dark:bg-neutral-900 border border-neutral-500/30 text-xs font-mono rounded px-2.5 py-1 focus:outline-none cursor-pointer">
+            <!-- Dynamic Room Options -->
+          </select>
+        </div>
+      </div>
+
+      <!-- CENTER AUDIO SCAPE CONTROLLER -->
+      <div class="flex items-center space-x-2 md:space-x-3 bg-black/5 dark:bg-neutral-900/90 border border-neutral-500/20 rounded-full px-3.5 py-1.5 shadow-inner">
+        <!-- Play / Pause Ambient -->
+        <button id="ambientPlayBtn" onclick="toggleAmbientMusic()" class="hover:text-amber-400 transition-colors flex items-center space-x-2">
+          <i data-lucide="play" id="ambientPlayIcon" class="w-3.5 h-3.5 fill-current"></i>
+          <span class="text-xs font-mono uppercase tracking-wider hidden sm:inline" id="ambientStatusText">Sound: Off</span>
+        </button>
+
+        <span class="text-neutral-500">|</span>
+
+        <!-- Audio Preset Selector -->
+        <select id="ambientPresetSelect" onchange="changeAmbientPreset(this.value)" class="bg-transparent text-[11px] font-mono text-neutral-400 focus:outline-none cursor-pointer">
+          <option value="piano" class="bg-neutral-900 text-white">Grand Piano & Hall Echo</option>
+          <option value="drone" class="bg-neutral-900 text-white">Deep Ambient Drone</option>
+          <option value="rain" class="bg-neutral-900 text-white">Rain on Skylight</option>
+          <option value="lofi" class="bg-neutral-900 text-white">Lo-Fi Chill Vinyl</option>
+          <option value="whisper" class="bg-neutral-900 text-white">Museum Whispers & Air</option>
+          <option value="custom" class="bg-neutral-900 text-white">★ Custom Audio File / Link</option>
+        </select>
+
+        <!-- Volume Slider -->
+        <input type="range" id="ambientVolume" min="0" max="1" step="0.05" value="0.5" oninput="adjustAmbientVolume(this.value)" class="w-14 md:w-20 accent-neutral-400 cursor-pointer hidden lg:block">
+
+        <!-- Custom Track Upload Icon -->
+        <button onclick="openCustomAudioModal()" class="p-1 hover:text-amber-400 transition-colors" title="Upload Custom Ambient Audio MP3">
+          <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- RIGHT TOOLBAR: LIGHT/DARK MODE, SPOTLIGHT, CURATOR -->
+      <div class="flex items-center space-x-2 md:space-x-3">
+        
+        <!-- Dark / Light Mode Toggle -->
+        <button id="themeToggleBtn" onclick="toggleThemeMode()" title="Toggle Dark / Light Gallery Wall" class="p-2 border border-neutral-500/30 hover:border-neutral-400 rounded-full transition-colors">
+          <i data-lucide="sun" id="themeIcon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Spotlight Glow Toggle -->
+        <button id="spotlightToggleBtn" onclick="toggleSpotlights()" title="Toggle Overhead Spotlights" class="p-2 border border-neutral-500/30 hover:border-neutral-400 rounded-full text-amber-300 transition-colors">
+          <i data-lucide="lightbulb" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Mode Selector (Visitor vs Curator) -->
+        <div class="flex items-center border border-neutral-500/30 rounded-full p-0.5 bg-black/10 dark:bg-neutral-900">
+          <button id="modeVisitorBtn" onclick="setAppMode('visitor')" class="px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase bg-neutral-800 text-white shadow">
+            Visitor
+          </button>
+          <button id="modeCuratorBtn" onclick="setAppMode('curator')" class="px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase text-neutral-400 hover:text-neutral-200">
+            Curator
+          </button>
+        </div>
+
+        <!-- Add Artwork Button (Curator Only) -->
+        <button id="addArtworkNavBtn" onclick="openUploadModal()" class="hidden items-center space-x-1.5 bg-neutral-100 text-neutral-950 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider hover:bg-white transition-all shadow-md">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span class="hidden lg:inline">Hang Artwork</span>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN HORIZONTAL GALLERY WALK CONTAINER -->
+  <main class="flex-grow pt-20 pb-16 relative flex flex-col justify-between overflow-hidden">
+    
+    <!-- Gallery Room Header Info -->
+    <div class="relative z-10 px-8 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between pointer-events-none max-w-7xl mx-auto w-full">
+      <div>
+        <span id="roomCategoryTag" class="text-[10px] font-mono tracking-widest uppercase text-amber-500 border border-amber-500/30 px-2.5 py-0.5 rounded bg-amber-500/10">
+          Special Exhibition
+        </span>
+        <h2 id="roomTitleHeader" class="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-neutral-900 dark:text-neutral-100 mt-1">
+          Our Life Rivers
+        </h2>
+        <p id="roomSubTitleHeader" class="text-xs md:text-sm font-serif italic text-neutral-400 mt-0.5">
+          (Of 25E1, by Mrs. Nguyen Thu Le Hang)
+        </p>
+      </div>
+
+      <!-- Navigation Guidance Tip -->
+      <div class="hidden sm:flex items-center space-x-3 text-[11px] font-mono text-neutral-400 bg-black/10 dark:bg-neutral-900/60 border border-neutral-500/20 px-3.5 py-1.5 rounded-full mt-2 sm:mt-0">
+        <i data-lucide="move-horizontal" class="w-3.5 h-3.5 text-amber-400 animate-pulse"></i>
+        <span>Scroll mouse or drag left/right to walk corridor</span>
+      </div>
+    </div>
+
+    <!-- HORIZONTAL SCROLLABLE GALLERY WALL CANVAS -->
+    <div 
+      id="galleryWalkCorridor" 
+      class="no-scrollbar flex-grow flex items-center overflow-x-auto overflow-y-hidden pan-grab my-2 relative py-8 px-12 md:px-24 space-x-16 md:space-x-24 select-none"
+      onmousedown="startPanDrag(event)"
+      onmouseleave="endPanDrag()"
+      onmouseup="endPanDrag()"
+      onmousemove="performPanDrag(event)"
+    >
+      <!-- Spotlights dynamically injected here per frame -->
+      <!-- Artworks rendered horizontally by JS -->
+    </div>
+
+    <!-- GALLERY FLOOR & HORIZONTAL PROGRESS CONTROL BAR -->
+    <div class="gallery-floor h-20 relative z-20 px-8 flex items-center justify-between border-t border-neutral-500/20">
+      
+      <!-- Left Arrow Jump -->
+      <button onclick="scrollGalleryCorridor(-400)" class="p-2 rounded-full border border-neutral-500/30 hover:border-neutral-400 text-neutral-400 hover:text-neutral-100 transition-colors" title="Walk Left">
+        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Floor Minimap & Progress Indicator Slider -->
+      <div class="flex-grow mx-6 max-w-2xl flex flex-col items-center">
+        <div class="flex justify-between w-full text-[10px] font-mono uppercase tracking-widest text-neutral-400 mb-1.5">
+          <span>Entrance</span>
+          <span id="exhibitionProgressText">Corridor Position: 0%</span>
+          <span>East Wing</span>
+        </div>
+        <div class="w-full bg-neutral-500/20 h-1.5 rounded-full overflow-hidden relative cursor-pointer" onclick="handleFloorBarClick(event)">
+          <div id="corridorProgressBar" class="bg-amber-400 h-full w-1/12 rounded-full transition-all duration-150"></div>
+        </div>
+      </div>
+
+      <!-- Right Arrow Jump -->
+      <button onclick="scrollGalleryCorridor(400)" class="p-2 rounded-full border border-neutral-500/30 hover:border-neutral-400 text-neutral-400 hover:text-neutral-100 transition-colors" title="Walk Right">
+        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+      </button>
+
+    </div>
+  </main>
+
+  <!-- 1. ARTWORK INSPECTION MODAL -->
+  <div id="inspectionModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md transition-opacity duration-300">
+    <div class="relative w-full max-w-5xl max-h-[92vh] glass-panel border border-neutral-500/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+      
+      <!-- Modal Close Button -->
+      <button onclick="closeInspectionModal()" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 border border-neutral-700 text-neutral-300 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Left / Right Artwork Quick Navigation -->
+      <button onclick="navigateInspectionModal(-1)" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/50 border border-neutral-700 text-neutral-300 hover:text-white">
+        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+      </button>
+      <button onclick="navigateInspectionModal(1)" class="absolute right-3 md:right-[41%] top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/50 border border-neutral-700 text-neutral-300 hover:text-white">
+        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Framed Artwork Canvas -->
+      <div class="w-full md:w-3/5 bg-neutral-950 p-8 md:p-12 flex items-center justify-center relative min-h-[350px] md:min-h-[550px] overflow-hidden">
+        <div class="absolute inset-0 spotlight-cone opacity-75"></div>
+        
+        <div id="modalFrameContainer" class="relative z-10 transition-transform duration-300 transform max-h-[70vh] flex items-center justify-center">
+          <img id="modalArtworkImg" src="" alt="Artwork Detail" class="max-h-[62vh] max-w-full object-contain cursor-zoom-in" onclick="zoomModalImage(this)">
+        </div>
+      </div>
+
+      <!-- Curator & Exhibition Details Panel -->
+      <div class="w-full md:w-2/5 p-6 md:p-8 flex flex-col justify-between overflow-y-auto border-t md:border-t-0 md:border-l border-neutral-500/20">
+        <div>
+          <div class="flex items-center justify-between border-b border-neutral-500/20 pb-4 mb-6">
+            <span id="modalRoomTag" class="text-[10px] font-mono uppercase tracking-widest text-amber-500 border border-amber-500/30 px-2.5 py-0.5 rounded bg-amber-500/10">
+              Exhibition Piece
+            </span>
+            <span id="modalYear" class="text-xs font-mono text-neutral-400">2025</span>
+          </div>
+
+          <h3 id="modalTitle" class="font-serif text-2xl md:text-3xl font-normal leading-snug">
+            Artwork Title
+          </h3>
+          <p id="modalArtist" class="text-sm font-mono text-neutral-400 mt-2">
+            Artist Name
+          </p>
+
+          <div class="my-6 space-y-3 border-y border-neutral-500/20 py-4 font-mono text-xs">
+            <div>
+              <span class="text-neutral-500 uppercase tracking-widest text-[10px] block">Medium</span>
+              <span id="modalMedium" class="font-sans">Archival Gelatin Silver Print</span>
+            </div>
+            <div>
+              <span class="text-neutral-500 uppercase tracking-widest text-[10px] block">Dimensions</span>
+              <span id="modalDimensions" class="font-sans">60 x 90 cm (Edition of 5)</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <span class="font-mono text-neutral-500 uppercase tracking-widest text-[10px] block">Curator Commentary</span>
+            <p id="modalDescription" class="text-xs md:text-sm text-neutral-300 dark:text-neutral-300 leading-relaxed font-light">
+              Curatorial notes and artistic details...
+            </p>
+          </div>
+        </div>
+
+        <!-- Audio Guide & Curator Actions -->
+        <div class="mt-8 pt-4 border-t border-neutral-500/20 flex items-center space-x-3">
+          <button onclick="playAudioGuide()" class="flex-1 flex items-center justify-center space-x-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-950 font-medium py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
+            <i data-lucide="headphones" class="w-4 h-4"></i>
+            <span>Audio Guide</span>
+          </button>
+
+          <button id="modalEditBtn" onclick="triggerEditFromModal()" class="hidden p-2.5 border border-neutral-500/40 hover:border-neutral-400 rounded-xl" title="Edit Piece">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </button>
+          <button id="modalDeleteBtn" onclick="triggerDeleteFromModal()" class="hidden p-2.5 border border-red-800 text-red-400 hover:border-red-600 rounded-xl" title="Remove Piece">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. CUSTOM AUDIO TRACK MODAL -->
+  <div id="customAudioModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-panel border border-neutral-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+      <div class="flex justify-between items-center border-b border-neutral-500/20 pb-3 mb-4">
+        <h3 class="font-serif text-lg">Custom Ambient Audio Track</h3>
+        <button onclick="closeCustomAudioModal()" class="text-neutral-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <p class="text-xs font-mono text-neutral-400 mb-4 leading-relaxed">
+        Upload an MP3 audio file or enter an audio URL to set your own gallery soundtrack.
+      </p>
+
+      <div class="space-y-4 font-mono text-xs">
+        <div>
+          <label class="block text-neutral-400 uppercase mb-1">Audio File MP3 Upload</label>
+          <input type="file" id="customAudioFileInput" accept="audio/*" onchange="handleAudioFileUpload(event)" class="w-full bg-black/20 border border-neutral-500/30 rounded p-2 text-neutral-300">
+        </div>
+
+        <div class="text-center text-neutral-500">- OR -</div>
+
+        <div>
+          <label class="block text-neutral-400 uppercase mb-1">Audio Stream URL</label>
+          <input type="url" id="customAudioUrlInput" placeholder="https://domain.com/soundtrack.mp3" class="w-full bg-black/20 border border-neutral-500/30 rounded p-2.5 text-neutral-200 focus:outline-none">
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button onclick="closeCustomAudioModal()" class="px-4 py-2 border border-neutral-500/30 rounded">Cancel</button>
+          <button onclick="applyCustomAudioUrl()" class="px-5 py-2 bg-neutral-100 text-neutral-950 rounded font-medium">Set Audio</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CURATOR UPLOAD / EDIT ARTWORK MODAL -->
+  <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-panel border border-neutral-500/30 rounded-2xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      
+      <div class="flex items-center justify-between border-b border-neutral-500/20 pb-4 mb-6">
+        <h3 id="uploadModalHeader" class="font-serif text-xl">Hang Artwork on Gallery Wall</h3>
+        <button onclick="closeUploadModal()" class="text-neutral-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="artworkForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs font-mono">
+        <input type="hidden" id="formArtworkId" value="">
+
+        <!-- Image Upload Source -->
+        <div>
+          <label class="block text-neutral-400 uppercase tracking-wider mb-1.5">Image Source</label>
+          <div class="flex space-x-2 mb-2">
+            <button type="button" onclick="setSourceType('url')" id="srcUrlBtn" class="flex-1 py-1.5 border border-neutral-500/30 rounded bg-neutral-800 text-white">Image URL</button>
+            <button type="button" onclick="setSourceType('file')" id="srcFileBtn" class="flex-1 py-1.5 border border-neutral-500/20 rounded text-neutral-400 hover:text-white">File Upload</button>
+          </div>
+
+          <div id="urlInputGroup">
+            <input type="url" id="artworkUrlInput" placeholder="https://images.unsplash.com/photo-..." class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+
+          <div id="fileInputGroup" class="hidden">
+            <input type="file" id="artworkFileInput" accept="image/*" onchange="handleImageFileSelect(event)" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2 text-neutral-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-neutral-800 file:text-neutral-200">
+          </div>
+
+          <!-- Image Preview Container -->
+          <div id="previewContainer" class="hidden mt-3 h-36 bg-black/30 rounded-lg border border-neutral-500/20 flex items-center justify-center overflow-hidden">
+            <img id="formImagePreview" src="" alt="Preview" class="h-full object-contain">
+          </div>
+        </div>
+
+        <!-- Title & Artist -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Title *</label>
+            <input type="text" id="artworkTitleInput" required placeholder="e.g. Flight in Silhouette" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Artist *</label>
+            <input type="text" id="artworkArtistInput" required placeholder="e.g. Helena Vance" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Frame & Mat Board Options -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Frame Style</label>
+            <select id="artworkFrameSelect" class="w-full bg-neutral-900 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+              <option value="frame-white-gallery">Classic Fine Art White Frame</option>
+              <option value="frame-black-gallery">Minimalist Matte Black Frame</option>
+              <option value="frame-oak-gallery">Natural Walnut / Oak Wood Frame</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Matting Width (Passe-partout)</label>
+            <select id="artworkMatSelect" class="w-full bg-neutral-900 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+              <option value="mat-thick">Thick Mat Board (Museum Style)</option>
+              <option value="mat-medium">Medium Standard Mat</option>
+              <option value="mat-thin">Thin Mat Border</option>
+              <option value="mat-none">No Mat (Full Bleed)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Vertical Hanging Height Position -->
+        <div>
+          <label class="block text-neutral-400 uppercase tracking-wider mb-1">Hanging Height on Wall</label>
+          <select id="artworkHangingSelect" class="w-full bg-neutral-900 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+            <option value="align-center">Center Eye-Level (Standard)</option>
+            <option value="align-start">High Hanging (Top Row)</option>
+            <option value="align-end">Low Hanging (Bottom Row)</option>
+          </select>
+        </div>
+
+        <!-- Medium, Year, Dimensions -->
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Year</label>
+            <input type="text" id="artworkYearInput" placeholder="2025" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Medium</label>
+            <input type="text" id="artworkMediumInput" placeholder="Archival Print" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-neutral-400 uppercase tracking-wider mb-1">Dimensions</label>
+            <input type="text" id="artworkDimensionsInput" placeholder="50 x 70 cm" class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-neutral-400 uppercase tracking-wider mb-1">Curatorial Notes</label>
+          <textarea id="artworkDescInput" rows="3" placeholder="Context or artistic notes..." class="w-full bg-black/20 border border-neutral-500/30 rounded-lg p-2.5 text-neutral-200 focus:outline-none font-sans text-xs"></textarea>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex justify-end space-x-3 pt-4 border-t border-neutral-500/20">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 border border-neutral-500/30 text-neutral-400 hover:text-white rounded-lg">Cancel</button>
+          <button type="submit" class="px-6 py-2 bg-neutral-100 text-neutral-950 font-medium hover:bg-white rounded-lg transition-colors">Save & Hang Artwork</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    // DEFAULT EXHIBITION ROOM DATA
+    const DEFAULT_EXHIBITION_ROOMS = [
+      {
+        id: 'main-corridor',
+        title: 'Our Life Rivers',
+        subtitle: '(Of 25E1, by Mrs. Nguyen Thu Le Hang)',
+        category: 'Exhibition Hall I',
+        description: 'An expansive horizontal gallery walk celebrating memory, reflection, and artistic journey.'
+      },
+      {
+        id: 'modern-wing',
+        title: 'Structural Architecture & Minimal Form',
+        subtitle: 'Curated Selections',
+        category: 'East Wing Gallery',
+        description: 'Focusing on high-rise symmetry, brutalist angles, light reflections, and modern spatial abstractions.'
+      }
+    ];
+
+    const DEFAULT_GALLERY_ARTWORKS = [
+      {
+        id: 'art-1',
+        roomId: 'main-corridor',
+        title: 'Skyscraper Verticality',
+        artist: 'Marcus Thorne',
+        year: '2024',
+        medium: 'Archival Gelatin Silver Print',
+        dimensions: '50 x 70 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-center',
+        imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
+        description: 'A striking upward perspective capturing the grid convergence of modern glass architecture against a muted sky.'
+      },
+      {
+        id: 'art-2',
+        roomId: 'main-corridor',
+        title: 'Glacial Ridgeline',
+        artist: 'Helena Vance',
+        year: '2023',
+        medium: 'Monochrome Pigment Print',
+        dimensions: '40 x 60 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-start',
+        imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80',
+        description: 'High-contrast landscape capture highlighting mountain ridges isolated in alpine snowstorms.'
+      },
+      {
+        id: 'art-3',
+        roomId: 'main-corridor',
+        title: 'Solar Transit in Silhouette',
+        artist: 'Soren Lindqvist',
+        year: '2025',
+        medium: 'Fine Art Matte Print',
+        dimensions: '70 x 100 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-medium',
+        hangingPosition: 'align-center',
+        imageUrl: 'https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?auto=format&fit=crop&w=1000&q=80',
+        description: 'A poetic silhouette shot of commercial aviation passing directly through sunlight over a dense metropolis.'
+      },
+      {
+        id: 'art-4',
+        roomId: 'main-corridor',
+        title: 'Solitary Leaf in Blue',
+        artist: 'Aria Chen',
+        year: '2024',
+        medium: 'C-Type Chromogenic Print',
+        dimensions: '40 x 50 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-end',
+        imageUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1000&q=80',
+        description: 'A delicate focal pop of natural organic detail framed against an expansive clear atmosphere.'
+      },
+      {
+        id: 'art-5',
+        roomId: 'main-corridor',
+        title: 'Metropolitan Grid Dense',
+        artist: 'Marcus Thorne',
+        year: '2022',
+        medium: 'Monochrome Print on Cotton Rag',
+        dimensions: '60 x 80 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-center',
+        imageUrl: 'https://images.unsplash.com/photo-1477959858617-67f30ac4ce78?auto=format&fit=crop&w=1000&q=80',
+        description: 'High altitude aerial perspective showing urban density and street grids stretching to the horizon.'
+      },
+      {
+        id: 'art-6',
+        roomId: 'main-corridor',
+        title: 'Alpine Mist Study',
+        artist: 'Helena Vance',
+        year: '2023',
+        medium: 'Silver Gelatin Print',
+        dimensions: '50 x 70 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-start',
+        imageUrl: 'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?auto=format&fit=crop&w=1000&q=80',
+        description: 'A sharp black-and-white tonal study of jagged mountain faces emerging from rising morning fog.'
+      },
+      {
+        id: 'art-7',
+        roomId: 'main-corridor',
+        title: 'Riverway Dusk Horizon',
+        artist: 'Kaito Tanaka',
+        year: '2025',
+        medium: 'Archival Inkjet Print',
+        dimensions: '80 x 120 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-medium',
+        hangingPosition: 'align-center',
+        imageUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1000&q=80',
+        description: 'Panoramic river horizon capturing warm atmospheric glow against urban skylines.'
+      },
+      {
+        id: 'art-8',
+        roomId: 'main-corridor',
+        title: 'Coastal Range Silhouette',
+        artist: 'Aria Chen',
+        year: '2024',
+        medium: 'Chromogenic Fine Art Print',
+        dimensions: '60 x 60 cm',
+        frameStyle: 'frame-white-gallery',
+        matStyle: 'mat-thick',
+        hangingPosition: 'align-end',
+        imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80',
+        description: 'Quiet mountain ridgelines situated above calm ocean waters under soft cloud cover.'
+      }
+    ];
+
+    // APPLICATION STATE
+    let appState = {
+      rooms: [],
+      artworks: [],
+      currentRoomId: 'main-corridor',
+      selectedArtworkId: null,
+      theme: 'dark', // 'dark' | 'light'
+      mode: 'visitor', // 'visitor' | 'curator'
+      spotlightsOn: true,
+      ambientPlaying: false,
+      ambientPreset: 'piano',
+      ambientVolume: 0.5,
+      customAudioElement: null,
+      sourceType: 'url',
+      uploadedImageData: null
+    };
+
+    // PAN / DRAG MOUSE SCROLL STATE
+    let panState = {
+      isDragging: false,
+      startX: 0,
+      scrollLeft: 0
+    };
+
+    // AUDIO SYNTHESIS ENGINE
+    let synthAudio = {
+      polySynth: null,
+      noiseNode: null,
+      loopEvent: null
+    };
+
+    function initAudioSynth() {
+      if (!synthAudio.polySynth) {
+        synthAudio.polySynth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 4, decay: 3, sustain: 0.8, release: 6 }
+        }).toDestination();
+        
+        synthAudio.polySynth.volume.value = -18;
+      }
+    }
+
+    function toggleAmbientMusic() {
+      if (appState.ambientPreset === 'custom' && appState.customAudioElement) {
+        const playBtnText = document.getElementById('ambientStatusText');
+        const playIcon = document.getElementById('ambientPlayIcon');
+
+        if (appState.ambientPlaying) {
+          appState.customAudioElement.pause();
+          appState.ambientPlaying = false;
+          playBtnText.textContent = 'Sound: Off';
+          playIcon.setAttribute('data-lucide', 'play');
+        } else {
+          appState.customAudioElement.play();
+          appState.ambientPlaying = true;
+          playBtnText.textContent = 'Sound: On';
+          playIcon.setAttribute('data-lucide', 'pause');
+        }
+        lucide.createIcons();
+        return;
+      }
+
+      initAudioSynth();
+      if (Tone.context.state !== 'running') {
+        Tone.start();
+      }
+
+      const playBtnText = document.getElementById('ambientStatusText');
+      const playIcon = document.getElementById('ambientPlayIcon');
+
+      if (appState.ambientPlaying) {
+        Tone.Transport.stop();
+        if (synthAudio.loopEvent) synthAudio.loopEvent.dispose();
+        appState.ambientPlaying = false;
+        playBtnText.textContent = 'Sound: Off';
+        playIcon.setAttribute('data-lucide', 'play');
+      } else {
+        startAmbientPresetLoop();
+        Tone.Transport.start();
+        appState.ambientPlaying = true;
+        playBtnText.textContent = 'Sound: On';
+        playIcon.setAttribute('data-lucide', 'pause');
+      }
+      lucide.createIcons();
+    }
+
+    function startAmbientPresetLoop() {
+      if (synthAudio.loopEvent) synthAudio.loopEvent.dispose();
+
+      const preset = appState.ambientPreset;
+
+      if (preset === 'piano') {
+        const chords = [
+          ["C3", "E3", "G3", "B3"],
+          ["A2", "C3", "E3", "G3"],
+          ["F2", "A2", "C3", "E3"],
+          ["G2", "B2", "D3", "F#3"]
+        ];
+        let step = 0;
+        synthAudio.loopEvent = new Tone.Loop(time => {
+          synthAudio.polySynth.triggerAttackRelease(chords[step % chords.length], "4n", time);
+          step++;
+        }, "4.5s").start(0);
+
+      } else if (preset === 'drone') {
+        synthAudio.loopEvent = new Tone.Loop(time => {
+          synthAudio.polySynth.triggerAttackRelease(["D2", "A2", "D3"], "1n", time);
+        }, "7s").start(0);
+
+      } else if (preset === 'rain' || preset === 'whisper') {
+        synthAudio.loopEvent = new Tone.Loop(time => {
+          synthAudio.polySynth.triggerAttackRelease(["C2", "G2", "E3"], "2n", time);
+        }, "5s").start(0);
+
+      } else if (preset === 'lofi') {
+        const lofiChords = [
+          ["D3", "F3", "A3", "C4"],
+          ["G2", "B2", "D3", "F3"],
+          ["C3", "E3", "G3", "B3"],
+          ["A2", "C3", "E3", "G3"]
+        ];
+        let step = 0;
+        synthAudio.loopEvent = new Tone.Loop(time => {
+          synthAudio.polySynth.triggerAttackRelease(lofiChords[step % lofiChords.length], "8n", time);
+          step++;
+        }, "3.5s").start(0);
+      }
+    }
+
+    function changeAmbientPreset(presetKey) {
+      if (presetKey === 'custom') {
+        openCustomAudioModal();
+        return;
+      }
+
+      if (appState.customAudioElement) {
+        appState.customAudioElement.pause();
+      }
+
+      appState.ambientPreset = presetKey;
+      if (appState.ambientPlaying) {
+        startAmbientPresetLoop();
+      }
+    }
+
+    function adjustAmbientVolume(val) {
+      appState.ambientVolume = parseFloat(val);
+      if (synthAudio.polySynth) {
+        const db = val == 0 ? -Infinity : -40 + (val * 34);
+        synthAudio.polySynth.volume.value = db;
+      }
+      if (appState.customAudioElement) {
+        appState.customAudioElement.volume = val;
+      }
+    }
+
+    // CUSTOM AUDIO MODAL FUNCTIONS
+    function openCustomAudioModal() {
+      document.getElementById('customAudioModal').classList.remove('hidden');
+    }
+    function closeCustomAudioModal() {
+      document.getElementById('customAudioModal').classList.add('hidden');
+    }
+
+    function handleAudioFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const fileUrl = URL.createObjectURL(file);
+        setCustomAudioTrack(fileUrl);
+      }
+    }
+
+    function applyCustomAudioUrl() {
+      const url = document.getElementById('customAudioUrlInput').value;
+      if (url) {
+        setCustomAudioTrack(url);
+      }
+    }
+
+    function setCustomAudioTrack(src) {
+      if (synthAudio.loopEvent) synthAudio.loopEvent.dispose();
+      if (Tone.Transport.state === 'started') Tone.Transport.stop();
+
+      if (!appState.customAudioElement) {
+        appState.customAudioElement = new Audio();
+        appState.customAudioElement.loop = true;
+      }
+      appState.customAudioElement.src = src;
+      appState.customAudioElement.volume = appState.ambientVolume;
+      appState.ambientPreset = 'custom';
+      document.getElementById('ambientPresetSelect').value = 'custom';
+
+      closeCustomAudioModal();
+      if (!appState.ambientPlaying) {
+        toggleAmbientMusic();
+      } else {
+        appState.customAudioElement.play();
+      }
+    }
+
+    // AUDIO GUIDE SPEECH SYNTHESIS
+    function playAudioGuide() {
+      const art = appState.artworks.find(a => a.id === appState.selectedArtworkId);
+      if (!art || !('speechSynthesis' in window)) return;
+
+      window.speechSynthesis.cancel();
+      const text = `${art.title}, created by ${art.artist} in ${art.year}. Medium: ${art.medium}. ${art.description}`;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // HORIZONTAL PAN SCROLLING ENGINE
+    function startPanDrag(e) {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      panState.isDragging = true;
+      corridor.classList.add('pan-grabbing');
+      corridor.classList.remove('pan-grab');
+      panState.startX = e.pageX - corridor.offsetLeft;
+      panState.scrollLeft = corridor.scrollLeft;
+    }
+
+    function endPanDrag() {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      panState.isDragging = false;
+      corridor.classList.remove('pan-grabbing');
+      corridor.classList.add('pan-grab');
+    }
+
+    function performPanDrag(e) {
+      if (!panState.isDragging) return;
+      e.preventDefault();
+      const corridor = document.getElementById('galleryWalkCorridor');
+      const x = e.pageX - corridor.offsetLeft;
+      const walk = (x - panState.startX) * 1.8; // Pan Speed Sensitivity
+      corridor.scrollLeft = panState.scrollLeft - walk;
+      updateFloorProgress();
+    }
+
+    function scrollGalleryCorridor(offset) {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      corridor.scrollBy({ left: offset, behavior: 'smooth' });
+      setTimeout(updateFloorProgress, 250);
+    }
+
+    function updateFloorProgress() {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      const maxScroll = corridor.scrollWidth - corridor.clientWidth;
+      const percentage = maxScroll > 0 ? (corridor.scrollLeft / maxScroll) * 100 : 0;
+
+      const bar = document.getElementById('corridorProgressBar');
+      const text = document.getElementById('exhibitionProgressText');
+
+      bar.style.width = `${Math.max(8, percentage)}%`;
+      text.textContent = `Corridor Position: ${Math.round(percentage)}%`;
+    }
+
+    function handleFloorBarClick(e) {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = clickX / rect.width;
+      const maxScroll = corridor.scrollWidth - corridor.clientWidth;
+      corridor.scrollTo({ left: pct * maxScroll, behavior: 'smooth' });
+      setTimeout(updateFloorProgress, 200);
+    }
+
+    // Convert Vertical Mouse Wheel to Horizontal Corridor Walk
+    document.addEventListener('DOMContentLoaded', () => {
+      const corridor = document.getElementById('galleryWalkCorridor');
+      corridor.addEventListener('wheel', (evt) => {
+        if (evt.deltaY !== 0) {
+          evt.preventDefault();
+          corridor.scrollLeft += evt.deltaY * 1.2;
+          updateFloorProgress();
+        }
+      }, { passive: false });
+
+      // Keyboard Arrow Keys Navigation
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') scrollGalleryCorridor(300);
+        if (e.key === 'ArrowLeft') scrollGalleryCorridor(-300);
+      });
+    });
+
+    // LIGHT / DARK THEME TOGGLE
+    function toggleThemeMode() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+
+      if (appState.theme === 'dark') {
+        appState.theme = 'light';
+        html.classList.remove('dark');
+        html.classList.add('light');
+        icon.setAttribute('data-lucide', 'moon');
+      } else {
+        appState.theme = 'dark';
+        html.classList.remove('light');
+        html.classList.add('dark');
+        icon.setAttribute('data-lucide', 'sun');
+      }
+      lucide.createIcons();
+    }
+
+    function toggleSpotlights() {
+      appState.spotlightsOn = !appState.spotlightsOn;
+      const btn = document.getElementById('spotlightToggleBtn');
+
+      if (appState.spotlightsOn) {
+        btn.classList.add('text-amber-300');
+        btn.classList.remove('text-neutral-500');
+      } else {
+        btn.classList.remove('text-amber-300');
+        btn.classList.add('text-neutral-500');
+      }
+      renderGalleryCorridor();
+    }
+
+    // PERSISTENCE & DATA STORAGE
+    function loadStorageData() {
+      const savedRooms = localStorage.getItem('aura_walk_rooms');
+      const savedArtworks = localStorage.getItem('aura_walk_artworks');
+
+      appState.rooms = savedRooms ? JSON.parse(savedRooms) : DEFAULT_EXHIBITION_ROOMS;
+      appState.artworks = savedArtworks ? JSON.parse(savedArtworks) : DEFAULT_GALLERY_ARTWORKS;
+    }
+
+    function saveStorageData() {
+      localStorage.setItem('aura_walk_rooms', JSON.stringify(appState.rooms));
+      localStorage.setItem('aura_walk_artworks', JSON.stringify(appState.artworks));
+    }
+
+    function initApp() {
+      loadStorageData();
+      renderRoomDropdown();
+      renderGalleryCorridor();
+      lucide.createIcons();
+    }
+
+    function renderRoomDropdown() {
+      const select = document.getElementById('roomSelect');
+      select.innerHTML = '';
+
+      appState.rooms.forEach(room => {
+        const opt = document.createElement('option');
+        opt.value = room.id;
+        opt.textContent = room.title;
+        opt.selected = room.id === appState.currentRoomId;
+        select.appendChild(opt);
+      });
+    }
+
+    function switchExhibitionRoom(roomId) {
+      appState.currentRoomId = roomId;
+      renderGalleryCorridor();
+    }
+
+    function setAppMode(mode) {
+      appState.mode = mode;
+      const vBtn = document.getElementById('modeVisitorBtn');
+      const cBtn = document.getElementById('modeCuratorBtn');
+      const addNavBtn = document.getElementById('addArtworkNavBtn');
+
+      if (mode === 'curator') {
+        cBtn.className = "px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase bg-neutral-800 text-amber-300 shadow";
+        vBtn.className = "px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase text-neutral-400 hover:text-neutral-200";
+        addNavBtn.classList.remove('hidden');
+        addNavBtn.classList.add('flex');
+      } else {
+        vBtn.className = "px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase bg-neutral-800 text-white shadow";
+        cBtn.className = "px-3 py-1 rounded-full text-[11px] font-mono tracking-wider uppercase text-neutral-400 hover:text-neutral-200";
+        addNavBtn.classList.add('hidden');
+        addNavBtn.classList.remove('flex');
+      }
+
+      renderGalleryCorridor();
+    }
+
+    // RENDER HORIZONTAL GALLERY CORRIDOR WALL
+    function renderGalleryCorridor() {
+      const room = appState.rooms.find(r => r.id === appState.currentRoomId) || appState.rooms[0];
+      const roomArtworks = appState.artworks.filter(a => a.roomId === appState.currentRoomId);
+
+      document.getElementById('roomCategoryTag').textContent = room.category || 'Corridor';
+      document.getElementById('roomTitleHeader').textContent = room.title;
+      const subHeader = document.getElementById('roomSubTitleHeader');
+      if (subHeader) {
+        subHeader.textContent = room.subtitle || '(Of 25E1, by Mrs. Nguyen Thu Le Hang)';
+      }
+
+      const corridor = document.getElementById('galleryWalkCorridor');
+      corridor.innerHTML = '';
+
+      if (roomArtworks.length === 0) {
+        corridor.innerHTML = `
+          <div class="text-center py-20 w-full font-mono text-neutral-400">
+            <i data-lucide="image-off" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p>No artworks hung in this corridor room.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      roomArtworks.forEach((art, idx) => {
+        const itemWrapper = document.createElement('div');
+        
+        // Vertical hanging alignment classes (center, high, low)
+        let flexAlign = 'items-center';
+        if (art.hangingPosition === 'align-start') flexAlign = 'items-start pt-6';
+        if (art.hangingPosition === 'align-end') flexAlign = 'items-end pb-8';
+
+        itemWrapper.className = `flex-none flex flex-col ${flexAlign} relative group cursor-pointer transition-transform duration-300 hover:-translate-y-1.5`;
+        itemWrapper.onclick = () => openInspectionModal(art.id);
+
+        itemWrapper.innerHTML = `
+          <!-- Spotlight Glow above artwork -->
+          ${appState.spotlightsOn ? `<div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 spotlight-cone pointer-events-none z-0"></div>` : ''}
+
+          <!-- Framed Artwork Piece -->
+          <div class="relative z-10 ${art.frameStyle || 'frame-white-gallery'} ${art.matStyle || 'mat-thick'} rounded-sm">
+            <div class="overflow-hidden bg-neutral-900 flex items-center justify-center min-w-[200px] max-w-[380px]">
+              <img src="${art.imageUrl}" alt="${art.title}" class="max-h-[340px] w-auto object-contain transition-transform duration-500 group-hover:scale-102">
+            </div>
+          </div>
+
+          <!-- Museum Plaque -->
+          <div class="museum-plaque mt-3.5 px-3 py-1.5 rounded-[2px] max-w-[200px] text-center z-10">
+            <h4 class="font-serif text-[11px] font-semibold tracking-tight truncate">${art.title}</h4>
+            <p class="text-[9px] font-mono opacity-80 truncate mt-0.5">${art.artist}, ${art.year}</p>
+          </div>
+
+          <!-- Curator Edit / Delete Buttons -->
+          ${appState.mode === 'curator' ? `
+            <div class="absolute -top-3 -right-3 z-30 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button onclick="event.stopPropagation(); openEditModal('${art.id}')" class="p-1.5 bg-neutral-900 text-neutral-200 border border-neutral-700 rounded-full hover:bg-black">
+                <i data-lucide="edit-2" class="w-3 h-3"></i>
+              </button>
+              <button onclick="event.stopPropagation(); deleteArtwork('${art.id}')" class="p-1.5 bg-neutral-900 text-red-400 border border-neutral-700 rounded-full hover:bg-black">
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+              </button>
+            </div>
+          ` : ''}
+        `;
+
+        corridor.appendChild(itemWrapper);
+      });
+
+      lucide.createIcons();
+      updateFloorProgress();
+    }
+
+    // INSPECTION MODAL OPERATIONS
+    function openInspectionModal(artId) {
+      const art = appState.artworks.find(a => a.id === artId);
+      if (!art) return;
+
+      appState.selectedArtworkId = artId;
+      const room = appState.rooms.find(r => r.id === art.roomId);
+
+      document.getElementById('modalArtworkImg').src = art.imageUrl;
+      document.getElementById('modalTitle').textContent = art.title;
+      document.getElementById('modalArtist').textContent = art.artist;
+      document.getElementById('modalRoomTag').textContent = room ? room.title : 'Exhibition Piece';
+      document.getElementById('modalYear').textContent = art.year || '2025';
+      document.getElementById('modalMedium').textContent = art.medium || 'Archival Print';
+      document.getElementById('modalDimensions').textContent = art.dimensions || 'Standard Size';
+      document.getElementById('modalDescription').textContent = art.description || 'No curatorial commentary provided.';
+
+      const frameBox = document.getElementById('modalFrameContainer');
+      frameBox.className = `relative z-10 transition-transform duration-300 transform max-h-[70vh] flex items-center justify-center ${art.frameStyle || 'frame-white-gallery'} ${art.matStyle || 'mat-thick'}`;
+
+      const editBtn = document.getElementById('modalEditBtn');
+      const deleteBtn = document.getElementById('modalDeleteBtn');
+
+      if (appState.mode === 'curator') {
+        editBtn.classList.remove('hidden');
+        deleteBtn.classList.remove('hidden');
+      } else {
+        editBtn.classList.add('hidden');
+        deleteBtn.classList.add('hidden');
+      }
+
+      document.getElementById('inspectionModal').classList.remove('hidden');
+    }
+
+    function closeInspectionModal() {
+      document.getElementById('inspectionModal').classList.add('hidden');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function navigateInspectionModal(direction) {
+      const roomArtworks = appState.artworks.filter(a => a.roomId === appState.currentRoomId);
+      if (roomArtworks.length <= 1) return;
+
+      const currentIdx = roomArtworks.findIndex(a => a.id === appState.selectedArtworkId);
+      let newIdx = currentIdx + direction;
+      if (newIdx < 0) newIdx = roomArtworks.length - 1;
+      if (newIdx >= roomArtworks.length) newIdx = 0;
+
+      openInspectionModal(roomArtworks[newIdx].id);
+    }
+
+    function zoomModalImage(img) {
+      img.classList.toggle('scale-150');
+    }
+
+    function triggerEditFromModal() {
+      if (appState.selectedArtworkId) {
+        closeInspectionModal();
+        openEditModal(appState.selectedArtworkId);
+      }
+    }
+
+    function triggerDeleteFromModal() {
+      if (appState.selectedArtworkId) {
+        deleteArtwork(appState.selectedArtworkId);
+        closeInspectionModal();
+      }
+    }
+
+    // CURATOR UPLOAD & EDIT OPERATIONS
+    function openUploadModal() {
+      document.getElementById('uploadModalHeader').textContent = 'Hang Artwork on Gallery Wall';
+      document.getElementById('artworkForm').reset();
+      document.getElementById('formArtworkId').value = '';
+      document.getElementById('previewContainer').classList.add('hidden');
+      setSourceType('url');
+
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function openEditModal(artId) {
+      const art = appState.artworks.find(a => a.id === artId);
+      if (!art) return;
+
+      document.getElementById('uploadModalHeader').textContent = 'Modify Artwork & Frame';
+      document.getElementById('formArtworkId').value = art.id;
+      document.getElementById('artworkTitleInput').value = art.title;
+      document.getElementById('artworkArtistInput').value = art.artist;
+      document.getElementById('artworkYearInput').value = art.year;
+      document.getElementById('artworkMediumInput').value = art.medium;
+      document.getElementById('artworkDimensionsInput').value = art.dimensions;
+      document.getElementById('artworkDescInput').value = art.description;
+      document.getElementById('artworkFrameSelect').value = art.frameStyle || 'frame-white-gallery';
+      document.getElementById('artworkMatSelect').value = art.matStyle || 'mat-thick';
+      document.getElementById('artworkHangingSelect').value = art.hangingPosition || 'align-center';
+      document.getElementById('artworkUrlInput').value = art.imageUrl;
+
+      setSourceType('url');
+      document.getElementById('formImagePreview').src = art.imageUrl;
+      document.getElementById('previewContainer').classList.remove('hidden');
+
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.add('hidden');
+    }
+
+    function setSourceType(type) {
+      appState.sourceType = type;
+      const urlGroup = document.getElementById('urlInputGroup');
+      const fileGroup = document.getElementById('fileInputGroup');
+      const urlBtn = document.getElementById('srcUrlBtn');
+      const fileBtn = document.getElementById('srcFileBtn');
+
+      if (type === 'url') {
+        urlGroup.classList.remove('hidden');
+        fileGroup.classList.add('hidden');
+        urlBtn.className = "flex-1 py-1.5 border border-neutral-500/30 rounded bg-neutral-800 text-white";
+        fileBtn.className = "flex-1 py-1.5 border border-neutral-500/20 rounded text-neutral-400 hover:text-white";
+      } else {
+        urlGroup.classList.add('hidden');
+        fileGroup.classList.remove('hidden');
+        fileBtn.className = "flex-1 py-1.5 border border-neutral-500/30 rounded bg-neutral-800 text-white";
+        urlBtn.className = "flex-1 py-1.5 border border-neutral-500/20 rounded text-neutral-400 hover:text-white";
+      }
+    }
+
+    function handleImageFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          appState.uploadedImageData = evt.target.result;
+          document.getElementById('formImagePreview').src = evt.target.result;
+          document.getElementById('previewContainer').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const existingId = document.getElementById('formArtworkId').value;
+      let finalImg = document.getElementById('artworkUrlInput').value;
+
+      if (appState.sourceType === 'file' && appState.uploadedImageData) {
+        finalImg = appState.uploadedImageData;
+      }
+
+      if (!finalImg) {
+        finalImg = 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1000&q=80';
+      }
+
+      const artworkData = {
+        id: existingId || `art-${Date.now()}`,
+        roomId: appState.currentRoomId,
+        title: document.getElementById('artworkTitleInput').value,
+        artist: document.getElementById('artworkArtistInput').value,
+        year: document.getElementById('artworkYearInput').value || '2025',
+        medium: document.getElementById('artworkMediumInput').value || 'Archival Print',
+        dimensions: document.getElementById('artworkDimensionsInput').value || 'Standard Size',
+        frameStyle: document.getElementById('artworkFrameSelect').value,
+        matStyle: document.getElementById('artworkMatSelect').value,
+        hangingPosition: document.getElementById('artworkHangingSelect').value,
+        imageUrl: finalImg,
+        description: document.getElementById('artworkDescInput').value || 'Exhibition piece.'
+      };
+
+      if (existingId) {
+        const idx = appState.artworks.findIndex(a => a.id === existingId);
+        if (idx !== -1) appState.artworks[idx] = artworkData;
+      } else {
+        appState.artworks.push(artworkData);
+      }
+
+      saveStorageData();
+      closeUploadModal();
+      renderGalleryCorridor();
+    }
+
+    function deleteArtwork(artId) {
+      appState.artworks = appState.artworks.filter(a => a.id !== artId);
+      saveStorageData();
+      renderGalleryCorridor();
+    }
+
+    // INITIALIZE APPLICATION
+    window.onload = function() {
+      initApp();
+    };
+  </script>
+</body>
+</html>
